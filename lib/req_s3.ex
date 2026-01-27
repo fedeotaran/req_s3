@@ -11,7 +11,7 @@ defmodule ReqS3 do
   def attach(request, options \\ []) do
     request
     |> Req.Request.register_options([:aws_endpoint_url_s3])
-    |> Req.Request.register_options([:s3_accelerate])
+    |> Req.Request.register_options([:accelerate])
     |> add_request_steps_before([s3_handle_url: &__MODULE__.handle_s3_url/1], :put_aws_sigv4)
     |> Req.merge(options)
     |> add_request_steps_before(
@@ -21,7 +21,7 @@ defmodule ReqS3 do
   end
 
   def use_acceleration(request) do
-    if request.options[:s3_accelerate] do
+    if request.options[:accelerate] do
       host =
         String.replace_suffix(
           request.url.host,
@@ -116,7 +116,7 @@ defmodule ReqS3 do
     * `:endpoint_url` - if set, the endpoint URL for S3-compatible services. If
       `AWS_ENDPOINT_URL_S3` system environment variable is set, it is considered first.
 
-    * `:s3_accelerate` - if set, use the S3 Accelerate endpoint.
+    * `:accelerate` - if set, use the S3 Accelerate endpoint.
 
   ## Examples
 
@@ -250,7 +250,7 @@ defmodule ReqS3 do
         :bucket,
         :key,
         :endpoint_url,
-        :s3_accelerate
+        :accelerate
       ]
     )
 
@@ -345,14 +345,14 @@ defmodule ReqS3 do
       end
 
     endpoint_url = options[:endpoint_url] || System.get_env("AWS_ENDPOINT_URL_S3")
-    s3_accelerate = options[:s3_accelerate]
+    accelerate = options[:accelerate]
 
     url =
       cond do
         endpoint_url ->
           "#{endpoint_url}/#{bucket}"
 
-        s3_accelerate ->
+        accelerate ->
           "https://#{options[:bucket]}.s3-accelerate.amazonaws.com"
 
         true ->

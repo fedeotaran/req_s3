@@ -221,7 +221,7 @@ defmodule ReqS3Test do
              ReqS3.presign_url(
                bucket: "bucket",
                key: "key.ext",
-               s3_accelerate: true,
+               accelerate: true,
                access_key_id: "",
                secret_access_key: ""
              )
